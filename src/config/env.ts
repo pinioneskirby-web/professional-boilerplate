@@ -8,13 +8,22 @@ const envSchema = Joi.object({
     NODE_ENV: Joi.string()
         .valid('development', 'production', 'test')
         .default('development'),
+
     PORT: Joi.number().default(3000),
+
     DB_HOST: Joi.string().required(),
     DB_PORT: Joi.number().default(3306),
     DB_USERNAME: Joi.string().required(),
-    DB_PASSWORD: Joi.string().allow('').required(),
+    DB_PASSWORD: Joi.string().required(),
     DB_DATABASE: Joi.string().required(),
-    FRONTEND_URL: Joi.string().uri().default('http://localhost:4200'),
+
+    FRONTEND_URL: Joi.string()
+        .uri()
+        .default('http://localhost:4200'),
+
+    // JWT Configuration
+    JWT_SECRET: Joi.string().min(32).required(),
+    JWT_EXPIRES_IN: Joi.string().default('24h'),
 }).unknown();
 
 const { value: env, error } = envSchema.prefs({
@@ -31,6 +40,7 @@ export const config = {
     isProd: env.NODE_ENV === 'production',
     isTest: env.NODE_ENV === 'test',
     port: env.PORT,
+
     db: {
         host: env.DB_HOST,
         port: env.DB_PORT,
@@ -38,5 +48,12 @@ export const config = {
         password: env.DB_PASSWORD,
         database: env.DB_DATABASE,
     },
+
     frontendUrl: env.FRONTEND_URL,
+
+    // JWT Configuration
+    jwt: {
+        secret: env.JWT_SECRET,
+        expiresIn: env.JWT_EXPIRES_IN,
+    },
 };
